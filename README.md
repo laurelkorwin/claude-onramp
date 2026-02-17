@@ -33,7 +33,7 @@ Claude Code is a powerful tool — it runs on your machine, can read and edit fi
 
 1. **Clone this repository:**
    ```
-   git clone <your-repo-url>
+   git clone https://github.com/laurelkorwin/claude-onramp.git
    cd claude-onramp
    ```
 
