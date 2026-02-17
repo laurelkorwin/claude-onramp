@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code Cheat Sheet</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font: 15px/1.7 system-ui, -apple-system, 'Segoe UI', sans-serif;
+    background: #f8f9fb; color: #1a1a2e;
+  }
+
+  /* --- Navigation --- */
+  nav {
+    position: fixed; top: 0; left: 0; width: 240px; height: 100vh;
+    background: #1a1a2e; color: #a0a0b8; padding: 24px 0;
+    overflow-y: auto; z-index: 10;
+  }
+  nav .logo { padding: 0 20px 20px; border-bottom: 1px solid #2a2a42; margin-bottom: 12px; }
+  nav .logo h1 { font-size: 16px; color: #fff; font-weight: 700; letter-spacing: -0.02em; }
+  nav .logo span { font-size: 11px; color: #6a6a8a; display: block; margin-top: 2px; }
+  nav a {
+    display: block; padding: 7px 20px; font-size: 13px; color: #8a8aa8;
+    text-decoration: none; transition: all 0.15s; border-left: 2px solid transparent;
+  }
+  nav a:hover { color: #d0d0e8; background: #22223a; }
+  nav a.section-head {
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em;
+    color: #4a4a68; margin-top: 16px; padding-bottom: 4px; pointer-events: none;
+  }
+  nav a.active { color: #fff; border-left-color: #6c63ff; background: #22223a; }
+
+  /* --- Main content --- */
+  main {
+    margin-left: 240px; max-width: 780px; padding: 48px 48px 80px;
+  }
+  h2 {
+    font-size: 22px; font-weight: 700; color: #1a1a2e; margin: 48px 0 8px;
+    padding-top: 16px; letter-spacing: -0.01em;
+  }
+  h2:first-of-type { margin-top: 0; }
+  h3 { font-size: 16px; font-weight: 600; color: #2a2a4e; margin: 28px 0 8px; }
+  p { margin: 8px 0 16px; color: #3a3a5e; }
+  .subtitle { font-size: 17px; color: #5a5a7a; margin-bottom: 32px; line-height: 1.6; }
+
+  /* --- Comparison table --- */
+  .compare-table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; }
+  .compare-table th {
+    text-align: left; font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.06em; color: #6a6a8a; padding: 8px 12px;
+    border-bottom: 2px solid #e0e0ec;
+  }
+  .compare-table td {
+    padding: 10px 12px; font-size: 14px; color: #3a3a5e;
+    border-bottom: 1px solid #ededf4;
+  }
+  .compare-table tr:last-child td { border-bottom: none; }
+  .compare-table .label { font-weight: 600; color: #1a1a2e; }
+  .yes { color: #059669; font-weight: 600; }
+  .no { color: #94a3b8; }
+
+  /* --- Command cards --- */
+  .cmd-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin: 16px 0 24px; }
+  .cmd-card {
+    background: #fff; border: 1px solid #e8e8f0; border-radius: 10px;
+    padding: 16px 20px; transition: box-shadow 0.15s;
+  }
+  .cmd-card:hover { box-shadow: 0 2px 12px rgba(108,99,255,0.08); }
+  .cmd-name {
+    font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', ui-monospace, monospace;
+    font-size: 14px; font-weight: 600; color: #6c63ff; display: inline-block;
+    background: #f0eeff; padding: 2px 8px; border-radius: 4px; margin-bottom: 6px;
+  }
+  .cmd-desc { font-size: 14px; color: #3a3a5e; margin-bottom: 6px; }
+  .cmd-when { font-size: 12px; color: #8a8aa8; }
+  .cmd-when strong { color: #5a5a7a; }
+
+  /* --- Concept cards --- */
+  .concept-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 16px 0 24px; }
+  .concept-card {
+    background: #fff; border: 1px solid #e8e8f0; border-radius: 10px; padding: 18px 20px;
+  }
+  .concept-card h4 {
+    font-size: 14px; font-weight: 700; color: #1a1a2e; margin-bottom: 6px;
+  }
+  .concept-card p { font-size: 13px; color: #5a5a7a; margin: 0; line-height: 1.6; }
+
+  /* --- Model table --- */
+  .model-table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; }
+  .model-table th {
+    text-align: left; font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.06em; color: #6a6a8a; padding: 8px 12px;
+    border-bottom: 2px solid #e0e0ec;
+  }
+  .model-table td {
+    padding: 10px 12px; font-size: 14px; color: #3a3a5e;
+    border-bottom: 1px solid #ededf4;
+  }
+  .model-table .model-name { font-weight: 700; color: #1a1a2e; }
+  .model-table tr:last-child td { border-bottom: none; }
+
+  /* --- Situation cards --- */
+  .situation { background: #fff; border: 1px solid #e8e8f0; border-radius: 10px; padding: 18px 20px; margin: 12px 0; }
+  .situation .q {
+    font-size: 15px; font-weight: 600; color: #1a1a2e; margin-bottom: 8px;
+  }
+  .situation .a { font-size: 14px; color: #3a3a5e; line-height: 1.7; }
+  .situation .a code {
+    font-family: 'SF Mono', 'Fira Code', ui-monospace, monospace;
+    font-size: 13px; background: #f0eeff; color: #6c63ff;
+    padding: 1px 6px; border-radius: 3px;
+  }
+
+  /* --- Callout --- */
+  .callout {
+    background: #f0eeff; border-left: 3px solid #6c63ff; border-radius: 0 8px 8px 0;
+    padding: 14px 18px; margin: 16px 0 24px;
+  }
+  .callout p { color: #3a3a5e; margin: 0; font-size: 14px; }
+  .callout strong { color: #1a1a2e; }
+  .callout code {
+    font-family: 'SF Mono', 'Fira Code', ui-monospace, monospace;
+    font-size: 13px; background: #e0dcff; padding: 1px 5px; border-radius: 3px;
+  }
+
+  /* --- Permission levels --- */
+  .perm-levels { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 16px 0 24px; }
+  .perm-level {
+    border-radius: 10px; padding: 16px 18px; text-align: center;
+  }
+  .perm-level.deny { background: #fef2f2; border: 1px solid #fecaca; }
+  .perm-level.ask { background: #fefce8; border: 1px solid #fde68a; }
+  .perm-level.allow { background: #f0fdf4; border: 1px solid #bbf7d0; }
+  .perm-level h4 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .perm-level.deny h4 { color: #dc2626; }
+  .perm-level.ask h4 { color: #ca8a04; }
+  .perm-level.allow h4 { color: #16a34a; }
+  .perm-level p { font-size: 12px; margin: 0; color: #5a5a7a; }
+
+  /* --- Footer --- */
+  footer {
+    margin-top: 48px; padding-top: 20px; border-top: 1px solid #e0e0ec;
+    font-size: 12px; color: #8a8aa8; text-align: center;
+  }
+
+  /* --- Responsive --- */
+  @media (max-width: 900px) {
+    nav { display: none; }
+    main { margin-left: 0; padding: 24px 20px 60px; }
+    .concept-grid { grid-template-columns: 1fr; }
+    .perm-levels { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">
+    <h1>Claude Code</h1>
+    <span>Cheat Sheet</span>
+  </div>
+  <a class="section-head">Getting Started</a>
+  <a href="#what-is-it">What is Claude Code?</a>
+  <a href="#safety-net">Your safety net</a>
+  <a class="section-head">Commands</a>
+  <a href="#essential">Essential commands</a>
+  <a href="#setup-config">Setup &amp; config</a>
+  <a href="#advanced">Advanced</a>
+  <a class="section-head">Reference</a>
+  <a href="#models">Models</a>
+  <a href="#permissions">Permissions</a>
+  <a href="#concepts">Key concepts</a>
+  <a class="section-head">Help</a>
+  <a href="#situations">Common situations</a>
+</nav>
+
+<main>
+
+<!-- ============================== -->
+<h2 id="what-is-it">What is Claude Code?</h2>
+<p class="subtitle">
+  Claude Code runs <strong>on your machine</strong>, not in a browser. It can see your files,
+  run commands, and make changes to your project. That makes it powerful — and it's why
+  understanding safety and permissions matters.
+</p>
+
+<table class="compare-table">
+  <thead>
+    <tr><th></th><th>Browser Claude</th><th>Claude Code</th></tr>
+  </thead>
+  <tbody>
+    <tr><td class="label">Where it runs</td><td>Anthropic's servers</td><td>Your machine</td></tr>
+    <tr><td class="label">Can see your files</td><td class="no">No</td><td class="yes">Yes</td></tr>
+    <tr><td class="label">Can run commands</td><td class="no">No</td><td class="yes">Yes</td></tr>
+    <tr><td class="label">Can edit your project</td><td class="no">No</td><td class="yes">Yes</td></tr>
+    <tr><td class="label">Can search the web</td><td class="no">Limited</td><td class="yes">Yes (with permission)</td></tr>
+    <tr><td class="label">Remembers across sessions</td><td class="no">Chat history</td><td class="yes">Persistent memory</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================== -->
+<h2 id="safety-net">Your safety net</h2>
+
+<div class="callout">
+  <p>
+    <strong>You can always undo.</strong> Claude Code saves a snapshot of your code before every change.
+    Press <code>Esc</code> twice or type <code>/rewind</code> to go back to any previous point.
+    You can restore your code, your conversation, or both.
+  </p>
+</div>
+
+<!-- ============================== -->
+<h2 id="essential">Essential commands</h2>
+<p>Type these at the Claude Code prompt.</p>
+
+<div class="cmd-grid">
+  <div class="cmd-card">
+    <span class="cmd-name">/help</span>
+    <div class="cmd-desc">See all available commands, including any custom ones set up for your project.</div>
+    <div class="cmd-when"><strong>When to use:</strong> You're not sure what's possible.</div>
+  </div>
+  <div class="cmd-card">
+    <span class="cmd-name">/clear</span>
+    <div class="cmd-desc">Start a completely fresh conversation. Your files and settings aren't affected — only the conversation resets.</div>
+    <div class="cmd-when"><strong>When to use:</strong> Switching to a different task, or Claude seems confused.</div>
+  </div>
+  <div class="cmd-card">
+    <span class="cmd-name">/compact</span>
+    <div class="cmd-desc">Free up conversation space. Conversations have a length limit — think of it like a whiteboard that fills up. This summarizes older notes to make room.</div>
+    <div class="cmd-when"><strong>When to use:</strong> Claude seems to forget things or is slowing down. (Also happens automatically.)</div>
+  </div>
+  <div class="cmd-card">
+    <span class="cmd-name">/cost</span>
+    <div class="cmd-desc">Check how much you've spent this session — token usage and dollar cost.</div>
+    <div class="cmd-when"><strong>When to use:</strong> Keeping track of spending, especially on longer tasks.</div>
+  </div>
+  <div class="cmd-card">
+    <span class="cmd-name">/model</span>
+    <div class="cmd-desc">Switch which Claude model you're using. You can change models mid-conversation.</div>
+    <div class="cmd-when"><strong>When to use:</strong> Switching to a faster model for quick questions, or a more thorough one for complex work.</div>
+  </div>
+  <div class="cmd-card">
+    <span class="cmd-name">Esc Esc</span>
+    <div class="cmd-desc">Open the rewind menu. Scroll through your prompts and restore code, conversation, or both to any previous point.</div>
+    <div class="cmd-when"><strong>When to use:</strong> Something went wrong and you want to go back.</div>
+  </div>
+</div>
+
+<!-- ============================== -->
+<h2 id="setup-config">Setup &amp; configuration</h2>
+<p>These help you configure how Claude Code behaves. Most are set-once.</p>
+
+<div class="cmd-grid">
+  <div class="cmd-card">
+    <span class="cmd-name">/setup</span>
+    <div class="cmd-desc">Guided first-time setup. Walks you through permissions, model selection, and preferences with plain-language explanations.</div>
+    <div class="cmd-when"><strong>When to use:</strong> First time using Claude Code, or want to reconfigure.</div>
+  </div>
+  <div class="cmd-card">
+    <span class="cmd-name">/config</span>
+    <div class="cmd-desc">Change settings interactively — model, output format, and other preferences.</div>
+    <div class="cmd-when"><strong>When to use:</strong> You want to tweak a specific setting.</div>
+  </div>
+  <div class="cmd-card">
+    <span class="cmd-name">/allowed-tools</span>
+    <div class="cmd-desc">View and change what Claude can do without asking permission.</div>
+    <div class="cmd-when"><strong>When to use:</strong> Claude asks too often (or not enough) before acting.</div>
+  </div>
+  <div class="cmd-card">
+    <span class="cmd-name">/init</span>
+    <div class="cmd-desc">Create a CLAUDE.md file — instructions that tell Claude how to behave in this project.</div>
+    <div class="cmd-when"><strong>When to use:</strong> Setting up a new project, or you want to customize Claude's behavior.</div>
+  </div>
+  <div class="cmd-card">
+    <span class="cmd-name">/memory</span>
+    <div class="cmd-desc">Manage what Claude remembers across sessions — project knowledge that persists.</div>
+    <div class="cmd-when"><strong>When to use:</strong> You want to see or edit what Claude has learned about your project.</div>
+  </div>
+  <div class="cmd-card">
+    <span class="cmd-name">/hooks</span>
+    <div class="cmd-desc">Configure automated checks that run when Claude takes certain actions.</div>
+    <div class="cmd-when"><strong>When to use:</strong> You want to enforce rules (like requiring explanations before actions).</div>
+  </div>
+</div>
+
+<!-- ============================== -->
+<h2 id="advanced">Advanced commands</h2>
+
+<div class="cmd-grid">
+  <div class="cmd-card">
+    <span class="cmd-name">/doctor</span>
+    <div class="cmd-desc">Diagnose problems with your Claude Code setup.</div>
+    <div class="cmd-when"><strong>When to use:</strong> Something seems broken — commands fail or things aren't working.</div>
+  </div>
+  <div class="cmd-card">
+    <span class="cmd-name">/add-dir</span>
+    <div class="cmd-desc">Give Claude access to additional folders beyond the current project.</div>
+    <div class="cmd-when"><strong>When to use:</strong> Your work spans multiple projects or repositories.</div>
+  </div>
+  <div class="cmd-card">
+    <span class="cmd-name">/agents</span>
+    <div class="cmd-desc">Create and manage helper agents that can work on tasks in parallel.</div>
+    <div class="cmd-when"><strong>When to use:</strong> Complex tasks that benefit from multiple agents working simultaneously.</div>
+  </div>
+  <div class="cmd-card">
+    <span class="cmd-name">/mcp</span>
+    <div class="cmd-desc">Connect Claude to external tools and services via the Model Context Protocol.</div>
+    <div class="cmd-when"><strong>When to use:</strong> You want Claude to interact with specific external tools.</div>
+  </div>
+</div>
+
+<!-- ============================== -->
+<h2 id="models">Models</h2>
+<p>Switch anytime with <code>/model</code>. Use faster models for quick tasks to save money.</p>
+
+<table class="model-table">
+  <thead>
+    <tr><th>Model</th><th>Best for</th><th>Speed</th><th>Cost</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="model-name">Opus</td>
+      <td>Complex tasks, multi-file changes, deep reasoning</td>
+      <td>Slower</td>
+      <td>Higher</td>
+    </tr>
+    <tr>
+      <td class="model-name">Sonnet</td>
+      <td>Everyday work — good balance of capability and speed</td>
+      <td>Medium</td>
+      <td>Medium</td>
+    </tr>
+    <tr>
+      <td class="model-name">Haiku</td>
+      <td>Quick questions, simple edits, fast searches</td>
+      <td>Fast</td>
+      <td>Lower</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="callout">
+  <p>
+    <strong>Tip:</strong> Claude can also use different models for subtasks automatically.
+    When it spins up a helper agent for a quick search, it might use Haiku even if you're
+    on Opus — saving you money without you having to think about it.
+  </p>
+</div>
+
+<!-- ============================== -->
+<h2 id="permissions">Permissions</h2>
+<p>Permissions control what Claude can do without asking you first.</p>
+
+<div class="perm-levels">
+  <div class="perm-level deny">
+    <h4>Deny</h4>
+    <p>Blocked entirely. Can't be overridden. Protects against dangerous mistakes.</p>
+  </div>
+  <div class="perm-level ask">
+    <h4>Ask</h4>
+    <p>Claude asks you each time. You see what it wants to do and can say yes or no.</p>
+  </div>
+  <div class="perm-level allow">
+    <h4>Allow</h4>
+    <p>Claude does it automatically. Speeds up routine work you trust.</p>
+  </div>
+</div>
+
+<p>
+  Deny always wins — if something is blocked, no allow rule can override it.
+  Run <code>/setup</code> to choose a permission profile, or see
+  <code>PERMISSIONS.md</code> for the full reference.
+</p>
+
+<!-- ============================== -->
+<h2 id="concepts">Key concepts</h2>
+
+<div class="concept-grid">
+  <div class="concept-card">
+    <h4>Context window</h4>
+    <p>How much Claude can hold in working memory. Like a desk — when it fills up, older notes get summarized. Use <code>/compact</code> to free space, or <code>/clear</code> to start fresh.</p>
+  </div>
+  <div class="concept-card">
+    <h4>Skills</h4>
+    <p>Custom commands (like <code>/setup</code>) that extend what Claude can do in a project. Defined in <code>.claude/skills/</code>.</p>
+  </div>
+  <div class="concept-card">
+    <h4>Hooks</h4>
+    <p>Automated checks that run when Claude takes actions. Can enforce rules, validate changes, or log what happened.</p>
+  </div>
+  <div class="concept-card">
+    <h4>CLAUDE.md</h4>
+    <p>A file of instructions Claude follows in this project. Like a briefing document — "here's how we do things here."</p>
+  </div>
+  <div class="concept-card">
+    <h4>Persistent memory</h4>
+    <p>Notes Claude keeps across sessions in <code>MEMORY.md</code>. This is how Claude learns your project over time. Manage with <code>/memory</code>.</p>
+  </div>
+  <div class="concept-card">
+    <h4>Checkpoints</h4>
+    <p>Automatic snapshots before every change. Press <code>Esc</code> twice to browse them and restore code, conversation, or both.</p>
+  </div>
+</div>
+
+<!-- ============================== -->
+<h2 id="situations">Common situations</h2>
+
+<div class="situation">
+  <div class="q">"Claude is acting slow or forgetting things"</div>
+  <div class="a">
+    Your context window may be filling up. Try <code>/compact</code> to free space,
+    or <code>/clear</code> to start fresh if your current task is done.
+  </div>
+</div>
+
+<div class="situation">
+  <div class="q">"I want to undo what Claude just did"</div>
+  <div class="a">
+    Press <code>Esc</code> twice to open the rewind menu. Pick the point you want to go back to.
+    You can restore just the code, just the conversation, or both.
+  </div>
+</div>
+
+<div class="situation">
+  <div class="q">"Claude keeps asking for permission and it's slowing me down"</div>
+  <div class="a">
+    Run <code>/setup</code> and choose a more permissive profile (Standard or Open),
+    or use <code>/allowed-tools</code> to grant specific permissions.
+  </div>
+</div>
+
+<div class="situation">
+  <div class="q">"I don't know if what Claude is doing is safe"</div>
+  <div class="a">
+    Look for the <code>[permission_explanation]</code> tag — Claude is required to explain every
+    new action in plain language before doing it. If you're unsure, just say "stop" or
+    "explain what that would do."
+  </div>
+</div>
+
+<div class="situation">
+  <div class="q">"I'm worried about costs"</div>
+  <div class="a">
+    Run <code>/cost</code> to check current spending. To reduce costs: use Haiku (<code>/model</code>)
+    for simple questions, start fresh sessions (<code>/clear</code>) when switching tasks, and be
+    specific in your requests.
+  </div>
+</div>
+
+<div class="situation">
+  <div class="q">"Something seems broken"</div>
+  <div class="a">
+    Run <code>/doctor</code> to diagnose setup issues. If that doesn't help,
+    try <code>/clear</code> for a fresh session.
+  </div>
+</div>
+
+<footer>
+  Claude Code Cheat Sheet &middot; See also: <code>PERMISSIONS.md</code> for permission details
+</footer>
+
+</main>
+
+<script>
+// Highlight active nav link on scroll
+const sections = document.querySelectorAll('h2[id]');
+const navLinks = document.querySelectorAll('nav a[href^="#"]');
+
+function updateActiveLink() {
+  let current = '';
+  sections.forEach(section => {
+    const top = section.getBoundingClientRect().top;
+    if (top < 120) current = section.id;
+  });
+  navLinks.forEach(link => {
+    link.classList.toggle('active', link.getAttribute('href') === '#' + current);
+  });
+}
+
+window.addEventListener('scroll', updateActiveLink);
+updateActiveLink();
+
+// Smooth scroll for nav links
+navLinks.forEach(link => {
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    const target = document.querySelector(link.getAttribute('href'));
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+</script>
+
+</body>
+</html>
